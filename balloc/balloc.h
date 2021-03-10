@@ -213,6 +213,23 @@ enum {
 	M0_BALLOC_BUDDY_LOOKUP_MAX = 10,
 };
 
+/*
+ * BALLOC_DEF_BLOCKS_PER_GROUP * (1 << BALLOC_DEF_BLOCK_SHIFT) = 128 MB -->
+ * which equals group size in ext4
+ */
+enum {
+	/** @todo should equal to size of HDD */
+	BALLOC_DEF_CONTAINER_SIZE	= 4096ULL * 32 * 1024 * 1000,
+	BALLOC_DEF_BLOCK_SHIFT		= 12,// 4K Blocks
+	/**
+	 * Approximate number of groups. Exact number of groups can differ
+	 * depending on group size restrictions.
+	 */
+	BALLOC_DEF_GROUPS_NR            = 64,
+	/** Used as minimal group size */
+	BALLOC_DEF_BLOCKS_PER_GROUP     = 65536,
+};
+
 /**
    BE-backed in-memory data structure for the balloc environment.
 
@@ -236,7 +253,7 @@ struct m0_balloc {
 	 * before the m0_format_footer, where only persistent fields allowed
 	 */
 	/** db for free extent */
-	struct m0_be_btree           cb_db_group_extents;
+	struct m0_be_btree           cb_db_group_extents[BALLOC_DEF_GROUPS_NR + 1];
 	/** db for group desc */
 	struct m0_be_btree           cb_db_group_desc;
 
@@ -318,23 +335,6 @@ struct m0_balloc_free_req {
 
 struct m0_balloc_discard_req {
 	void           *bdr_prealloc; /*< User opaque prealloc result */
-};
-
-/*
- * BALLOC_DEF_BLOCKS_PER_GROUP * (1 << BALLOC_DEF_BLOCK_SHIFT) = 128 MB -->
- * which equals group size in ext4
- */
-enum {
-	/** @todo should equal to size of HDD */
-	BALLOC_DEF_CONTAINER_SIZE	= 4096ULL * 32 * 1024 * 1000,
-	BALLOC_DEF_BLOCK_SHIFT		= 12,// 4K Blocks
-	/**
-	 * Approximate number of groups. Exact number of groups can differ
-	 * depending on group size restrictions.
-	 */
-	BALLOC_DEF_GROUPS_NR            = 64,
-	/** Used as minimal group size */
-	BALLOC_DEF_BLOCKS_PER_GROUP     = 32768,
 };
 
 /**
