@@ -29,6 +29,7 @@
 #include "lib/tlist.h"
 #include "matvec.h"
 #include "ls_solve.h"
+#include "parity_defs.h"
 
 /**
    @defgroup parity_math Parity Math Component
@@ -107,21 +108,25 @@ struct m0_parity_math {
 
 	uint32_t		pmi_data_count;
 	uint32_t		pmi_parity_count;
+#if RS_ENCODE_ENABLED
 	/* structures used for parity calculation and recovery */
 	struct m0_matvec	pmi_data;
 	struct m0_matvec	pmi_parity;
+#endif /* RS_ENCODE_ENABLED */
 	/* Vandermonde matrix */
 	struct m0_matrix	pmi_vandmat;
 	/* Submatrix of Vandermonde matrix used to compute parity. */
 	struct m0_matrix	pmi_vandmat_parity_slice;
 	/* structures used for non-incremental recovery */
 	struct m0_matrix	pmi_sys_mat;
+#if RS_ENCODE_ENABLED
 	struct m0_matvec	pmi_sys_vec;
 	struct m0_matvec	pmi_sys_res;
 	struct m0_linsys	pmi_sys;
+#endif /* RS_ENCODE_ENABLED */
 	/* Data recovery matrix that's inverse of pmi_sys_mat. */
 	struct m0_matrix	pmi_recov_mat;
-#ifndef __KERNEL__
+#if ISAL_ENCODE_ENABLED
 	/* Pointer to sets of arrays of input coefficients used
 	 * to encode or decode data.*/
 	uint8_t		       *pmi_encode_matrix;
@@ -129,7 +134,7 @@ struct m0_parity_math {
 	uint8_t		       *pmi_encode_tbls;
 	/* Pointer to concatenated output tables for decode */
 	uint8_t		       *pmi_decode_tbls;
-#endif
+#endif /* ISAL_ENCODE_ENABLED */
 };
 
 /* Holds information essential for incremental recovery. */
